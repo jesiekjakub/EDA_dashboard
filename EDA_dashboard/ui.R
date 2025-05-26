@@ -32,7 +32,7 @@ dashboardPage(
     tabItems(
       tabItem(tabName = "readme",
               h2("README"),
-              p("This dashboard allows interactive exploration of a dataset...")
+              p("This dashboard was designed to facilitate Exploratory Data Analysis (EDA) on a dataset capturing student habits and academic performance. Leveraging the R Shiny framework and interactive visualization libraries such as Plotly and ggplot2, it enables users to dynamically explore the relationships between various numerical and categorical variables through a variety of analytical lenses."),
       ),
       
       tabItem(tabName = "overview",
@@ -82,8 +82,8 @@ dashboardPage(
               h2("Mixed-Type Relationship Analysis"),
               fluidRow(
                 box(title = "Categorical Heatmap", width = 12, solidHeader = TRUE, status = "primary",
-                    selectInput("mix_relation_heat_x", "Categorical X-axis", choices = categorical_columns),
-                    selectInput("mix_relation_heat_y", "Y-axis", choices = categorical_columns),
+                    selectInput("mix_relation_heat_x", "X-axis Attribute", choices = categorical_columns),
+                    selectInput("mix_relation_heat_y", "Y-axis Attribute", choices = categorical_columns),
                     plotlyOutput("mix_relation_heatmap_plot")
                 ),
                 box(title = "Boxplot Grouped by Category", width = 12, solidHeader = TRUE, status = "info",

@@ -7,6 +7,8 @@ library(ggplot2)
 
 
 function(input, output, session) {
+  colors_palette = colorRampPalette(c("#3498DB", "#18BC9C", "#F39C12", "#E74C3C", "#8E44AD", "#2C3E50"))
+  
   # Set which columns are numerical and which are categorical
   numerical_columns = c("age","study_hours_per_day","social_media_hours","netflix_hours","attendance_percentage","sleep_hours","exercise_frequency","mental_health_rating","exam_score","grade")
   categorical_columns = c("gender","part_time_job","diet_quality","parental_education_level","internet_quality","extracurricular_participation")
@@ -28,9 +30,7 @@ function(input, output, session) {
     select(-student_id)
 
   
-  
 ### OVERVIEW ###################################################################   
-  colors = colorRampPalette(c("#3498DB", "#18BC9C", "#F39C12", "#E74C3C", "#8E44AD", "#2C3E50"))
   
   # Create datatable
   output$overview_student_table = renderDT({
@@ -45,10 +45,10 @@ function(input, output, session) {
   })
   
   # Create histogram for numerical attributes
-  output$overview_hist_plot <- renderPlot({
+  output$overview_hist_plot = renderPlot({
     req(input$overview_num_col)
     ggplot(main_df, aes_string(x = input$overview_num_col)) +
-      geom_histogram(bins = input$overview_num_bins, fill = colors(1), color = "white") +
+      geom_histogram(bins = input$overview_num_bins, fill = colors_palette(1), color = "white") +
       labs(x = input$overview_num_col, y = "Count") +
       theme_minimal()
   })
@@ -58,7 +58,7 @@ function(input, output, session) {
     req(input$overview_cat_col)
     categories = unique(main_df[[input$overview_cat_col]])
     n_categories = length(categories)
-    fill_colors = setNames(colors(n_categories), categories)
+    fill_colors = setNames(colors_palette(n_categories), categories)
     ggplot(main_df, aes_string(x = input$overview_cat_col, fill = input$overview_cat_col)) +
       geom_bar() +
       scale_fill_manual(values = fill_colors) +
@@ -72,10 +72,10 @@ function(input, output, session) {
 ### NUMERICAL RELATION #########################################################
   
   # Create dynamic sliders 
-  output$num_relation_dynamic_sliders <- renderUI({
-    slider_ui <- lapply(numerical_columns, function(col) {
-      min_val <- min(main_df[[col]], na.rm = TRUE)
-      max_val <- max(main_df[[col]], na.rm = TRUE)
+  output$num_relation_dynamic_sliders = renderUI({
+    slider_ui = lapply(numerical_columns, function(col) {
+      min_val = min(main_df[[col]], na.rm = TRUE)
+      max_val = max(main_df[[col]], na.rm = TRUE)
       sliderInput(
         inputId = paste0(col, "_range"),
         label = paste("Filter:", col),
@@ -94,7 +94,7 @@ function(input, output, session) {
     for (col in numerical_columns) {
       range_input = input[[paste0(col, "_range")]]
       if (!is.null(range_input)) {
-        df <- df[df[[col]] >= range_input[1] & df[[col]] <= range_input[2], ]
+        df = df[df[[col]] >= range_input[1] & df[[col]] <= range_input[2], ]
       }
     }
     df
@@ -102,32 +102,29 @@ function(input, output, session) {
   
   
   # Heatmap Plot
-  output$num_relation_correlation_heatmap <- renderPlotly({
-    df <- filtered_df()
-    cor_matrix <- cor(df[numerical_columns], use = "complete.obs")
+  output$num_relation_correlation_heatmap = renderPlotly({
+    df = filtered_df()
+    cor_matrix = cor(df[numerical_columns], use = "complete.obs")
     plot_ly(
       x = colnames(cor_matrix),
       y = colnames(cor_matrix),
       z = cor_matrix,
       type = "heatmap",
-      colorscale = "Viridis"
+      colorscale = "RdBu"
       )
   })
   
   
   # Scatterplot
-  output$num_relation_scatter_plot <- renderPlotly({
+  output$num_relation_scatter_plot = renderPlotly({
     req(input$num_relation_scatter_x, input$num_relation_scatter_y)
-    df <- filtered_df() 
-    
+    df = filtered_df() 
     plot_ly(
       data = df,
       x = ~get(input$num_relation_scatter_x),
       y = ~get(input$num_relation_scatter_y),
       color = ~factor(grade),
-      colors = c("#18BC9C", "#3498DB", "#F39C12", "#E74C3C", "#8E44AD", "#2C3E50"),
-      
-#      colors = "Set1",
+      colors = c("#3498DB", "#18BC9C", "#F39C12", "#E74C3C", "#8E44AD", "#2C3E50"),
       type = 'scatter',
       mode = 'markers',
       marker = list(size = 8, opacity = 0.6)
@@ -139,16 +136,17 @@ function(input, output, session) {
       )
   })
   
+  
   # Density plot
-  output$num_relation_density_plot <- renderPlotly({
+  output$num_relation_density_plot = renderPlotly({
     req(input$num_relation_scatter_x, input$num_relation_scatter_y)
-    df <- filtered_df()
+    df = filtered_df()
     
     plot_ly(df, 
             x = ~get(input$num_relation_scatter_x), 
             y = ~get(input$num_relation_scatter_y), 
             type = "histogram2dcontour",
-            colorscale = "Viridis",
+            colorscale = "RdBu",
             contours = list(coloring = "heatmap")) %>%
       layout(
         title = "2D Density Plot",
@@ -158,28 +156,28 @@ function(input, output, session) {
   })
   
   # One-vs-All Correlation Plot
-  output$num_relation_one_vs_all_plot <- renderPlotly({
+  output$num_relation_one_vs_all_plot = renderPlotly({
     req(input$num_relation_one_vs_all)
-    df <- filtered_df()
-    target <- input$num_relation_one_vs_all
-    cor_vals <- sapply(numerical_columns, function(col) {
+    df = filtered_df()
+    target = input$num_relation_one_vs_all
+    cor_vals = sapply(numerical_columns, function(col) {
       if (col == target) return(NA)
       cor(df[[target]], df[[col]], use = "complete.obs")
     })
-    cor_df <- data.frame(
+    cor_df = data.frame(
       Attribute = numerical_columns,
       Correlation = cor_vals,
       stringsAsFactors = FALSE
     )
-    cor_df <- cor_df[!is.na(cor_df$Correlation), ]
-    cor_df <- cor_df[order(abs(cor_df$Correlation)), ]  # Sort by absolute value of correlation descending
+    cor_df = cor_df[!is.na(cor_df$Correlation), ]
+    cor_df = cor_df[order(abs(cor_df$Correlation)), ]  # Sort by absolute value of correlation descending
     
     plot_ly(
       data = cor_df,
       x = ~reorder(Attribute, Correlation),  # x reordered by decreasing correlation
       y = ~Correlation,
       type = 'bar',
-      marker = list(color = "steelblue")
+      marker = list(color = "#3498DB")
     ) %>%
       layout(
         yaxis = list(title = paste("Correlation with", target)),
@@ -193,21 +191,20 @@ function(input, output, session) {
 ### CATEGORICAL RELATION #######################################################
 
   # Create Heatmap
-  output$mix_relation_heatmap_plot <- renderPlotly({
+  output$mix_relation_heatmap_plot = renderPlotly({
     req(input$mix_relation_heat_x, input$mix_relation_heat_y)
     req(input$mix_relation_heat_x != input$mix_relation_heat_y)
-    df <- main_df
-    
-    x_col <- input$mix_relation_heat_x
-    y_col <- input$mix_relation_heat_y
+    df = main_df
+    x_col = input$mix_relation_heat_x
+    y_col = input$mix_relation_heat_y
     
     # Group by the selected categorical variables
-    grouped <- df %>%
+    grouped = df %>%
       group_by(.data[[x_col]], .data[[y_col]]) %>%
       summarise(Count = n(), .groups = "drop")
     
     # Rename to generic names for plotly to work with
-    grouped <- grouped %>%
+    grouped = grouped %>%
       rename(X = !!x_col, Y = !!y_col)
     
     plot_ly(
@@ -216,7 +213,7 @@ function(input, output, session) {
       y = ~Y,
       z = ~Count,
       type = "heatmap",
-      colors = "Blues"
+      colors = "RdBu"
     ) %>%
       layout(
         title = "Heatmap of Counts",
@@ -228,9 +225,9 @@ function(input, output, session) {
   
   
   # Create Boxplots
-  output$mix_relation_boxplot_plot <- renderPlotly({
+  output$mix_relation_boxplot_plot = renderPlotly({
     req(input$mix_relation_box_x, input$mix_relation_box_y)
-    df <- filtered_df()
+    df = filtered_df()
     
     plot_ly(
       data = df,
@@ -238,8 +235,9 @@ function(input, output, session) {
       y = ~.data[[input$mix_relation_box_y]],
       type = "violin",
       color = ~.data[[input$mix_relation_box_x]],
-      box = list(visible = FALSE),         # Set to TRUE if you also want a box inside
-      meanline = list(visible = TRUE),     # Show mean line
+      colors = c("#3498DB", "#18BC9C", "#F39C12", "#E74C3C", "#8E44AD"),
+      box = list(visible = FALSE),        
+      meanline = list(visible = TRUE),     
       points = FALSE 
     ) %>%
       layout(
