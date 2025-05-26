@@ -3,6 +3,7 @@ library(shinydashboard)
 library(readr)
 library(dplyr)
 library(DT)
+library(plotly)
 
 numerical_columns = c("age","study_hours_per_day","social_media_hours","netflix_hours","attendance_percentage","sleep_hours","exercise_frequency","mental_health_rating","exam_score","grade")
 categorical_columns = c("gender","part_time_job","diet_quality","parental_education_level","internet_quality","extracurricular_participation")
@@ -14,7 +15,7 @@ dashboardPage(
       tags$img(src = "PUT_logo.png", height = "40px", width = "40px", style = "margin-right:10px;"),
       "EDA Dashboard"
     ),
-    titleWidth = 230  # Optional: adjust based on logo+text width
+    titleWidth = 230  
   ),
   
     
@@ -55,13 +56,42 @@ dashboardPage(
       
       
       tabItem(tabName = "num_relation",
-              h2("Numerical Columns Relationship Analysis"),
-              # Scatter plots, correlation heatmaps, parallel coordinate plots
+              h2("Numerical Attributes Relationship Analysis"),
+              fluidRow(
+                box(title = "Correlation Heatmap with Filters", width = 12, status = "primary", solidHeader = TRUE,
+                    plotlyOutput("num_relation_correlation_heatmap"),
+                    uiOutput("num_relation_dynamic_sliders")  # Rendered from the server
+                )
+              ),
+              fluidRow(
+                box(title = "Scatter Plot Between Two Attributes", width = 12, status = "info", solidHeader = TRUE,
+                    selectInput("num_relation_scatter_x", "X-axis Attribute", choices = numerical_columns),
+                    selectInput("num_relation_scatter_y", "Y-axis Attribute", choices = numerical_columns),
+                    plotlyOutput("num_relation_scatter_plot"),
+                    br(),
+                    plotlyOutput("num_relation_density_plot")
+                ),
+                box(title = "One Attribute vs All Others Correlations", width = 12, status = "info", solidHeader = TRUE,
+                    selectInput("num_relation_one_vs_all", "Choose Attribute", choices = numerical_columns),
+                    plotlyOutput("num_relation_one_vs_all_plot")
+                )
+              )
       ),
       
       tabItem(tabName = "mix_relation",
               h2("Mixed-Type Relationship Analysis"),
-              # Grouped bar charts, boxplots by category, violin plots, etc.
+              fluidRow(
+                box(title = "Categorical Heatmap", width = 12, solidHeader = TRUE, status = "primary",
+                    selectInput("mix_relation_heat_x", "Categorical X-axis", choices = categorical_columns),
+                    selectInput("mix_relation_heat_y", "Y-axis", choices = categorical_columns),
+                    plotlyOutput("mix_relation_heatmap_plot")
+                ),
+                box(title = "Boxplot Grouped by Category", width = 12, solidHeader = TRUE, status = "info",
+                    selectInput("mix_relation_box_x", "Categorical Attribute (X)", choices = categorical_columns),
+                    selectInput("mix_relation_box_y", "Numeric Attribute (Y)", choices = numerical_columns),
+                    plotlyOutput("mix_relation_boxplot_plot")
+                )
+              )
       )
     )
   )
