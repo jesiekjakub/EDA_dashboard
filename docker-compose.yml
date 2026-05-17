@@ -1,0 +1,70 @@
+services:
+  # One-shot Kaggle fetcher. Skips immediately if the CSV is already
+  # present; otherwise downloads the dataset via kagglehub and deletes
+  # its own source script from the host working tree (via the /host
+  # bind mount). The whole-repo bind is the cheapest way to let a
+  # container delete a host file by name without leaving an empty-
+  # directory placeholder behind on subsequent runs.
+  #
+  # Auth: ~/.kaggle/ is bind-mounted read-only into /root/.kaggle.
+  # kagglehub auto-detects whichever credential file is present —
+  # access_token (KGAT_...) or kaggle.json — so no env vars needed.
+  fetcher:
+    image: python:3.12-slim
+    container_name: eda-fetcher
+    working_dir: /work
+    volumes:
+      - ./data:/work/data
+      - ./:/host
+      - ${HOME}/.kaggle:/root/.kaggle:ro
+    environment:
+      KAGGLE_CONFIG_DIR: /root/.kaggle
+    restart: "no"
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        if [ -f /work/data/student_habits_performance.csv ]; then
+          echo "Dataset already present, skipping download."
+          exit 0
+        fi
+        if [ ! -f /host/bootstrap_data.py ]; then
+          echo "WARN: bootstrap_data.py is missing and the dataset is not present." >&2
+          echo "      Restore the script from git or place the CSV in data/ manually." >&2
+          exit 0
+        fi
+        if [ ! -f /root/.kaggle/access_token ] && [ ! -f /root/.kaggle/kaggle.json ]; then
+          echo "ERROR: No Kaggle credentials found in ~/.kaggle/." >&2
+          echo "       Place one of:" >&2
+          echo "         ~/.kaggle/access_token   (new OAuth token, KGAT_...)" >&2
+          echo "         ~/.kaggle/kaggle.json    (legacy username + key)" >&2
+          exit 1
+        fi
+        pip install --no-cache-dir --quiet kagglehub
+        python /host/bootstrap_data.py
+
+  eda:
+    build: .
+    container_name: eda-dashboard
+    ports:
+      - "${SHINY_PORT:-3838}:3838"
+    volumes:
+      # Mount the local data/ directory read-only. The container looks
+      # for student_habits_performance.csv here at app startup; nothing
+      # writes back, so :ro is appropriate.
+      - ./data:/home/shiny/app/data:ro
+    environment:
+      # R's default heap cap can be tight for plotly's serialized output
+      # on a large dataset; bump it via an env override if needed.
+      - R_MAX_VSIZE=${R_MAX_VSIZE:-4Gb}
+    restart: unless-stopped
+    depends_on:
+      fetcher:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3838/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s

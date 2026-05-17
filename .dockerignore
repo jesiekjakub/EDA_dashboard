@@ -1,0 +1,39 @@
+# VCS / CI
+.git
+.gitignore
+.github
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# R artifacts
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+renv/library/
+renv/staging/
+renv/.cache/
+
+# IDE / OS
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Docs and tests don't ship in the runtime image
+docs
+tests
+*.md
+LICENSE
+
+# Local data — bind-mounted at runtime
+data
+
+# Secrets
+.env
+.env.local
+.env.example

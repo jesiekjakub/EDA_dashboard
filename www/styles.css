@@ -1,0 +1,213 @@
+/* Polish on top of Darkly + bslib defaults. Mostly tightening Bootstrap
+   card spacing and toning the navbar — the underlying theme already
+   handles colors via the bs_theme() call in R/theme.R. */
+
+body {
+  background-color: #1a1d23;
+}
+
+/* Navbar: darker than the body, thinner border underneath. */
+.navbar {
+  background-color: #15181d !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 0.55rem;
+  padding-bottom: 0.55rem;
+}
+
+.navbar-brand {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-size: 1rem;
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+.navbar-brand > div {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+/* Soft white pill behind the brand logo so a colored crest reads cleanly
+   against the dark navbar regardless of whether the PNG has alpha. */
+.navbar-brand img {
+  height: 32px;
+  width: 32px;
+  object-fit: contain;
+  background-color: #ffffff;
+  border-radius: 50%;
+  padding: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  flex-shrink: 0;
+}
+
+.navbar-brand .brand-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-link {
+  color: rgba(255, 255, 255, 0.65) !important;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  transition: color 120ms ease, background-color 120ms ease;
+}
+
+.nav-link:hover {
+  color: #ffffff !important;
+}
+
+.nav-link.active {
+  color: #18BC9C !important;
+  border-bottom: 2px solid #18BC9C;
+}
+
+/* Cards: subtle border, soft shadow, generous breathing room. */
+.card {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background-color: #222831;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  margin-bottom: 1.25rem;
+  border-radius: 8px;
+}
+
+.card-header {
+  background-color: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: -0.005em;
+  padding: 0.85rem 1.1rem;
+}
+
+.card-body {
+  padding: 1.1rem;
+}
+
+/* Value boxes — the KPI strip at the top of the Overview tab. */
+.bslib-value-box {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.bslib-value-box .value-box-title {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.bslib-value-box .value-box-value {
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Form controls: match the dark theme, dial label weight back to "field" */
+.form-label {
+  font-size: 0.82rem;
+  color: #b3b8c0;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+
+.form-control,
+.form-select {
+  background-color: #1a1d23;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cfd2d6;
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: #1a1d23;
+  border-color: #18BC9C;
+  box-shadow: 0 0 0 0.15rem rgba(24, 188, 156, 0.18);
+  color: #ffffff;
+}
+
+/* Sliders — `irs` is the ionRangeSlider widget shiny ships. */
+.irs--shiny .irs-bar,
+.irs--shiny .irs-from,
+.irs--shiny .irs-to,
+.irs--shiny .irs-single {
+  background-color: #18BC9C;
+}
+
+.irs--shiny .irs-line {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.irs--shiny .irs-min,
+.irs--shiny .irs-max,
+.irs--shiny .irs-grid-text {
+  color: #8a8f97;
+  background: transparent;
+}
+
+/* DataTables — pull foreground into spec, kill the harsh borders */
+.dataTables_wrapper {
+  color: #cfd2d6;
+}
+
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+  background-color: #1a1d23;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cfd2d6;
+}
+
+table.dataTable.display tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+table.dataTable th,
+table.dataTable td {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+table.dataTable thead th {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Pagination buttons inside the DT footer */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  color: #cfd2d6 !important;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  background: #18BC9C !important;
+  color: #ffffff !important;
+  border-color: #18BC9C;
+}
+
+/* Section heading inside the About tab */
+h4 {
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: #ffffff;
+}
+
+.text-muted {
+  color: #8a8f97 !important;
+}
+
+/* Validate() messages should look like an empty-state card, not a stack trace */
+.shiny-output-error-validation {
+  color: #b3b8c0;
+  font-size: 0.92rem;
+  padding: 1.5rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+}

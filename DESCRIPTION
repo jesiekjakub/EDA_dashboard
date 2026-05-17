@@ -1,0 +1,26 @@
+Package: EDA.dashboard
+Title: Student Habits and Performance EDA Dashboard
+Version: 1.0.0
+Authors@R: person("Jakub", "Radziejewski",
+                  email = "jakub.j@mylead.eu",
+                  role  = c("aut", "cre"))
+Description: Interactive R Shiny dashboard for exploratory data analysis on
+    a student-habits / academic-performance dataset. Three analytical lenses
+    (univariate distributions, numerical relationships, mixed-type
+    relationships) wrapped in a dark, card-based bslib UI with Plotly
+    visualizations.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends:
+    R (>= 4.1)
+Imports:
+    shiny (>= 1.8.0),
+    bslib (>= 0.6.0),
+    dplyr (>= 1.1.0),
+    readr (>= 2.1.0),
+    DT (>= 0.30),
+    plotly (>= 4.10.0),
+    ggplot2 (>= 3.4.0),
+    thematic (>= 0.1.4),
+    rlang (>= 1.1.0)
+SystemRequirements: pandoc (>= 1.12.3)

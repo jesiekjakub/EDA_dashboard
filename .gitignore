@@ -1,0 +1,33 @@
+# R / RStudio
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+
+# renv (keep renv.lock if added, ignore the package cache)
+renv/library/
+renv/staging/
+renv/.cache/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets / env
+.env
+.env.local
+
+# Data — pulled from Kaggle, see data/README.md
+data/*.csv
+data/*.parquet
+data/*.tsv
+
+# Build artifacts
+*.tar.gz
+*.zip
+*.log
